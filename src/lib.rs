@@ -67,7 +67,7 @@ impl PyTaxonCache {
         Ok(size)
     }
 
-    pub fn save(self, cachefile: &PyUnicode) -> PyResult<usize> {
+    pub fn save(&self, cachefile: &PyUnicode) -> PyResult<usize> {
         let size = self
             .cache
             .save_path(&cachefile.extract()?)
