@@ -1,30 +1,41 @@
+use std::error;
 use std::fmt;
 
-use pyo3::exceptions::PyOSError;
+use pyo3::exceptions::{PyOSError, PyValueError};
 use pyo3::prelude::*;
-use pyo3::types::PyUnicode;
+use pyo3::types::{PyLong, PyUnicode};
 
 use mibig_taxa::{MibigTaxonError, TaxonCache};
 
+#[derive(Debug)]
 enum PyMibigTaxonError {
     MibigError(MibigTaxonError),
+    NotFound(i64),
 }
+
+impl error::Error for PyMibigTaxonError {}
 
 impl fmt::Display for PyMibigTaxonError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self)
+        match self {
+            PyMibigTaxonError::MibigError(e) => write!(f, "{}", e),
+            PyMibigTaxonError::NotFound(id) => write!(f, "ID {} not found", id),
+        }
     }
 }
 
-impl From<MibigTaxonError> for PyMibigTaxonError {
+impl std::convert::From<MibigTaxonError> for PyMibigTaxonError {
     fn from(err: MibigTaxonError) -> PyMibigTaxonError {
         PyMibigTaxonError::MibigError(err)
     }
 }
 
-impl From<PyMibigTaxonError> for PyErr {
+impl std::convert::From<PyMibigTaxonError> for PyErr {
     fn from(err: PyMibigTaxonError) -> PyErr {
-        PyOSError::new_err(err.to_string())
+        match err {
+            PyMibigTaxonError::MibigError(_) => PyOSError::new_err(err.to_string()),
+            PyMibigTaxonError::NotFound(_) => PyValueError::new_err(err.to_string()),
+        }
     }
 }
 
