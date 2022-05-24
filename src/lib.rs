@@ -37,10 +37,15 @@ struct PyTaxonCache {
 #[pymethods]
 impl PyTaxonCache {
     #[new]
-    fn new() -> Self {
-        PyTaxonCache {
+    fn new(cachefile: Option<&PyUnicode>) -> PyResult<Self> {
+        let mut cache = PyTaxonCache {
             cache: TaxonCache::new(),
+        };
+
+        if let Some(filename) = cachefile {
+            cache.load(filename)?;
         }
+        Ok(cache)
     }
 
     pub fn initialise(
