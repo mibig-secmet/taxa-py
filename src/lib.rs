@@ -90,6 +90,27 @@ impl PyTaxonCache {
             .map_err(PyMibigTaxonError::from)?;
         Ok(size)
     }
+
+    #[args(allow_deprecated = "false")]
+    pub fn get_name_by_id(&self, id: &PyLong, allow_deprecated: bool) -> PyResult<String> {
+        let tax_id: i64 = id.extract()?;
+
+        if let Some(entry) = self.cache.mappings.get(&tax_id) {
+            return Ok(entry.name.clone());
+        } else {
+            if !allow_deprecated {
+                let err = PyMibigTaxonError::NotFound(tax_id);
+                return Err(PyErr::from(err));
+            }
+            if let Some(new_id) = self.cache.deprecated_ids.get(&tax_id) {
+                if let Some(entry) = self.cache.mappings.get(&new_id) {
+                    return Ok(entry.name.clone());
+                }
+            }
+        }
+        let err = PyMibigTaxonError::NotFound(tax_id);
+        Err(PyErr::from(err))
+    }
 }
 
 #[pymodule]

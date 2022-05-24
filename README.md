@@ -47,6 +47,32 @@ cache.load("my_cache.json")
 
 ```
 
+To get an ID mapping, use
+
+```python
+from mibig_taxa import TaxonCache
+
+cache = TaxonCache("my_cache.json")
+
+id_to_map = 123456
+name = get_name_by_id(id_to_map)
+
+print(f"Taxon with ID {id_to_map} is called {name}")
+```
+
+If you want to transparently support deprecated IDs, also set the `allow_deprecated` argument to `True`:
+
+```python
+from mibig_taxa import TaxonCache
+
+cache = TaxonCache("my_cache.json")
+
+deprecated_id_to_map = 123456
+name = get_name_by_id(deprecated_id_to_map, allow_deprecated=True)
+
+print(f"Taxon with deprecated ID {deprecated_id_to_map} is called {name}")
+```
+
 ## License
 
 Licensed under the Apache License, Version 2.0
