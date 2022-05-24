@@ -4,11 +4,13 @@ build-backend = "maturin"
 
 [project]
 name = "mibig-taxa"
+description = "Python bindings to the MIBiG taxon handling"
+license = { text = "Apache-2.0" }
+readme = "README.md"
+repository = "https://github.com/mibig-secmet/taxa-py"
 requires-python = ">=3.6"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-
-
