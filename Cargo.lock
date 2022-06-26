@@ -139,7 +139,7 @@ dependencies = [
 
 [[package]]
 name = "mibig-taxa-py"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "mibig-taxa",
  "pyo3",

@@ -73,6 +73,19 @@ name = get_name_by_id(deprecated_id_to_map, allow_deprecated=True)
 print(f"Taxon with deprecated ID {deprecated_id_to_map} is called {name}")
 ```
 
+To get the mapping to an antiSMASH `--taxon` value, use:
+
+```python
+from mibig_taxa import TaxonCache
+
+cache = TaxonCache("my_cache.json")
+
+tax_id = 123456
+as_taxon = cache.get_antismash_taxon(tax_id)
+
+print(f"For antiSMASH, use --taxon {as_taxon} with tax_id {tax_id}")
+```
+
 ## License
 
 Licensed under the Apache License, Version 2.0
