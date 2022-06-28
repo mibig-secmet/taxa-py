@@ -147,6 +147,13 @@ fn get_taxon_from_entry(entry: &NcbiTaxEntry) -> PyResult<String> {
         "Eukaryota" => match entry.kingdom.as_str() {
             "Fungi" => return Ok("fungi".to_string()),
             "Viridiplantae" => return Ok("plants".to_string()),
+            "Unknown" => match entry.phylum.as_str() {
+                "Rhodophyta" => return Ok("plants".to_string()),
+                _ => {
+                    let err = PyMibigTaxonError::InvalidAntismashTaxon(entry.phylum.clone());
+                    return Err(PyErr::from(err));
+                }
+            },
             _ => {
                 let err = PyMibigTaxonError::InvalidAntismashTaxon(entry.kingdom.clone());
                 return Err(PyErr::from(err));
