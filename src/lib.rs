@@ -46,6 +46,81 @@ impl std::convert::From<PyMibigTaxonError> for PyErr {
     }
 }
 
+/// Python version of NcbiTaxEntry
+#[pyclass(name = "TaxonEntry", module = "mibig_taxa")]
+struct PyTaxonEntry {
+    #[pyo3(get)]
+    tax_id: i64,
+    #[pyo3(get)]
+    name: String,
+    #[pyo3(get)]
+    species: String,
+    #[pyo3(get)]
+    genus: String,
+    #[pyo3(get)]
+    family: String,
+    #[pyo3(get)]
+    order: String,
+    #[pyo3(get)]
+    class: String,
+    #[pyo3(get)]
+    phylum: String,
+    #[pyo3(get)]
+    kingdom: String,
+    #[pyo3(get)]
+    superkingdom: String,
+}
+
+#[pymethods]
+impl PyTaxonEntry {
+    pub fn __str__(&self) -> String {
+        format!("{} ({})", self.name, self.tax_id)
+    }
+
+    pub fn __repr__(&self) -> String {
+        format!("{} ({})", self.name, self.tax_id)
+    }
+
+    pub fn get_antismash_taxon(&self) -> PyResult<String> {
+        let ncbi_entry: NcbiTaxEntry = self.into();
+        get_taxon_from_entry(&ncbi_entry)
+    }
+}
+
+impl std::convert::From<&NcbiTaxEntry> for PyTaxonEntry {
+    fn from(entry: &NcbiTaxEntry) -> Self {
+        PyTaxonEntry {
+            tax_id: entry.tax_id,
+            name: entry.name.to_string(),
+            species: entry.species.to_string(),
+            genus: entry.genus.to_string(),
+            family: entry.family.to_string(),
+            order: entry.order.to_string(),
+            class: entry.class.to_string(),
+            phylum: entry.phylum.to_string(),
+            kingdom: entry.kingdom.to_string(),
+            superkingdom: entry.superkingdom.to_string(),
+        }
+    }
+}
+
+impl std::convert::From<&PyTaxonEntry> for NcbiTaxEntry {
+    fn from(entry: &PyTaxonEntry) -> Self {
+        NcbiTaxEntry {
+            tax_id: entry.tax_id,
+            name: entry.name.to_string(),
+            species: entry.species.to_string(),
+            genus: entry.genus.to_string(),
+            family: entry.family.to_string(),
+            order: entry.order.to_string(),
+            class: entry.class.to_string(),
+            phylum: entry.phylum.to_string(),
+            kingdom: entry.kingdom.to_string(),
+            superkingdom: entry.superkingdom.to_string(),
+        }
+    }
+}
+
 /// Python version of the TaxonCache
 #[pyclass(name = "TaxonCache", module = "mibig_taxa")]
 struct PyTaxonCache {
@@ -139,6 +214,27 @@ impl PyTaxonCache {
         let err = PyMibigTaxonError::NotFound(tax_id);
         Err(PyErr::from(err))
     }
+
+    #[args(allow_deprecated = "false")]
+    pub fn get(&self, id: &PyLong, allow_deprecated: bool) -> PyResult<PyTaxonEntry> {
+        let tax_id: i64 = id.extract()?;
+
+        if let Some(entry) = self.cache.mappings.get(&tax_id) {
+            return Ok(PyTaxonEntry::from(entry));
+        } else {
+            if !allow_deprecated {
+                let err = PyMibigTaxonError::NotFound(tax_id);
+                return Err(PyErr::from(err));
+            }
+            if let Some(new_id) = self.cache.deprecated_ids.get(&tax_id) {
+                if let Some(entry) = self.cache.mappings.get(&new_id) {
+                    return Ok(PyTaxonEntry::from(entry));
+                }
+            }
+        }
+        let err = PyMibigTaxonError::NotFound(tax_id);
+        Err(PyErr::from(err))
+    }
 }
 
 fn get_taxon_from_entry(entry: &NcbiTaxEntry) -> PyResult<String> {
@@ -169,5 +265,6 @@ fn get_taxon_from_entry(entry: &NcbiTaxEntry) -> PyResult<String> {
 #[pymodule]
 fn mibig_taxa(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyTaxonCache>()?;
+    m.add_class::<PyTaxonEntry>()?;
     Ok(())
 }
