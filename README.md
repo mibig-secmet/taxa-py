@@ -86,6 +86,22 @@ as_taxon = cache.get_antismash_taxon(tax_id)
 print(f"For antiSMASH, use --taxon {as_taxon} with tax_id {tax_id}")
 ```
 
+You can also grab individual entries directly:
+```python
+from mibig_taxa import TaxonCache
+
+cache = TaxonCache("my_cache.json")
+
+tax_id = 123456
+entry = cache.get(tax_id)
+
+# "class" is a reserved keyword in python, can't use it directly
+entry_class = getattr(entry, "class")
+
+print(f"{entry.superkingdom} > {entry.kingdom} > {entry.phylum} > {entry_class} > {entry.order} > {entry.family} > {entry.name}")
+
+```
+
 ## License
 
 Licensed under the Apache License, Version 2.0
