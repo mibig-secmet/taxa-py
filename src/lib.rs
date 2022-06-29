@@ -244,7 +244,14 @@ fn get_taxon_from_entry(entry: &NcbiTaxEntry) -> PyResult<String> {
             "Fungi" => return Ok("fungi".to_string()),
             "Viridiplantae" => return Ok("plants".to_string()),
             "Unknown" => match entry.phylum.as_str() {
-                "Rhodophyta" => return Ok("plants".to_string()),
+                "Rhodophyta" | "Bacillariophyta" => return Ok("plants".to_string()),
+                "Unknown" => match entry.class.as_str() {
+                    "Dinophyceae" => return Ok("plants".to_string()),
+                    _ => {
+                        let err = PyMibigTaxonError::InvalidAntismashTaxon(entry.class.clone());
+                        return Err(PyErr::from(err));
+                    }
+                },
                 _ => {
                     let err = PyMibigTaxonError::InvalidAntismashTaxon(entry.phylum.clone());
                     return Err(PyErr::from(err));
@@ -255,10 +262,8 @@ fn get_taxon_from_entry(entry: &NcbiTaxEntry) -> PyResult<String> {
                 return Err(PyErr::from(err));
             }
         },
-        _ => {
-            let err = PyMibigTaxonError::InvalidAntismashTaxon(entry.superkingdom.clone());
-            return Err(PyErr::from(err));
-        }
+        // Many metagenomes are superkingdom "Unknown" but still bacterial
+        _ => return Ok("bacteria".to_string()),
     }
 }
 
