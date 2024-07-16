@@ -68,7 +68,7 @@ from mibig_taxa import TaxonCache
 cache = TaxonCache("my_cache.json")
 
 deprecated_id_to_map = 123456
-name = get_name_by_id(deprecated_id_to_map, allow_deprecated=True)
+name = cache.get_name_by_id(deprecated_id_to_map, allow_deprecated=True)
 
 print(f"Taxon with deprecated ID {deprecated_id_to_map} is called {name}")
 ```
