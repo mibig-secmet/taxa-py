@@ -1,6 +1,6 @@
 [package]
 name = "mibig-taxa-py"
-version = "0.1.4"
+version = "0.2.0"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -10,4 +10,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.15.1", features = ["extension-module"] }
-mibig-taxa = "0.1"
+mibig-taxa = "0.2"

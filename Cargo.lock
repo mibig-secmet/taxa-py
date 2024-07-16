@@ -128,9 +128,9 @@ dependencies = [
 
 [[package]]
 name = "mibig-taxa"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5dac11e162c400da25b2e64ef934333782ace7f17848eef026a5f94e823ff71d"
+checksum = "4c7fea846703cf56eb9d1a38146b6dc49a9119a962f68f5ec20cb8b9f29f2be2"
 dependencies = [
  "serde",
  "serde_json",
@@ -139,7 +139,7 @@ dependencies = [
 
 [[package]]
 name = "mibig-taxa-py"
-version = "0.1.4"
+version = "0.2.0"
 dependencies = [
  "mibig-taxa",
  "pyo3",
